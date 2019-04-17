@@ -66,12 +66,21 @@ public final class CameraViewController: UIViewController {
         captureDevice.unlockForConfiguration()
       } catch {}
 
-      flashButton.setImage(torchMode.image, for: UIControlState())
+        flashButton.setImage(torchMode.image, for: UIControl.State())
     }
   }
 
   private var frontCameraDevice: AVCaptureDevice? {
-    return AVCaptureDevice.devices(for: .video).first(where: { $0.position == .front })
+    
+    //return AVCaptureDevice.devices(for: .video).first(where: { $0.position == .front })
+
+    let deviceDiscoverySession = AVCaptureDevice.default(.builtInWideAngleCamera, for: AVMediaType.video, position: .back)
+    
+    guard let captureDevice = deviceDiscoverySession else {
+        print("Failed to get the camera device")
+        return nil
+    }
+    return captureDevice
   }
 
   private var backCameraDevice: AVCaptureDevice? {
@@ -173,7 +182,7 @@ public final class CameraViewController: UIViewController {
     NotificationCenter.default.addObserver(
       self,
       selector: #selector(appWillEnterForeground),
-      name: NSNotification.Name.UIApplicationWillEnterForeground,
+      name: NSNotification.Name.UIApplication.willEnterForegroundNotification,
       object: nil
     )
   }
@@ -415,14 +424,14 @@ private extension CameraViewController {
       string: localizedString("BUTTON_SETTINGS"),
       attributes: [.font: UIFont.boldSystemFont(ofSize: 17), .foregroundColor: UIColor.white]
     )
-    button.setAttributedTitle(title, for: UIControlState())
+    button.setAttributedTitle(title, for: UIControl.State())
     button.sizeToFit()
     return button
   }
 
   func makeCameraButton() -> UIButton {
     let button = UIButton(type: .custom)
-    button.setImage(imageNamed("cameraRotate"), for: UIControlState())
+    button.setImage(imageNamed("cameraRotate"), for: UIControl.State())
     button.isHidden = !showsCameraButton
     return button
   }
